@@ -1,0 +1,7 @@
+node_modules
+dist
+.netlify
+.firebase
+.env
+.env.local
+coverage

@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/appshell.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/lib/firebase.ts","./src/lib/passwords.test.ts","./src/lib/passwords.ts"],"version":"5.9.3"}

@@ -28,6 +28,7 @@ import passwordGeneratorLogo from "./assets/password-generator-logo.png";
 
 const HOME_PATH = "/";
 const APP_PATH = "/generator";
+const STATUS_MESSAGE_TIMEOUT_MS = 4000;
 
 const defaultConfig: PasswordConfig = {
   length: 16,
@@ -235,11 +236,7 @@ function AppScreen({
     <div className="app-shell">
       <header className="workspace-header">
         <div className="workspace-title">
-          <div>
-            <p className="section-kicker">Generator workspace</p>
-            <h1>パスワード生成</h1>
-          </div>
-          <p className="workspace-subcopy">設定を整えて、結果確認と保存までをひとつの画面で進められます。</p>
+          <img className="workspace-logo" src={passwordGeneratorLogo} alt="Password Generator" />
         </div>
 
         <div className="account-inline" aria-label="ログイン中のアカウント">
@@ -259,7 +256,7 @@ function AppScreen({
       </header>
 
       <div className="status-banner-area">
-        <div className="status-box">{statusMessage}</div>
+        {statusMessage ? <div className="status-box">{statusMessage}</div> : null}
         {errorMessage ? <div className="error-box">{errorMessage}</div> : null}
       </div>
 
@@ -573,6 +570,18 @@ export default function App() {
     if (loadingAuth) return;
     syncPath(user ? APP_PATH : HOME_PATH);
   }, [loadingAuth, user]);
+
+  useEffect(() => {
+    if (!statusMessage) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      setStatusMessage("");
+    }, STATUS_MESSAGE_TIMEOUT_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [statusMessage]);
 
   useEffect(() => {
     if (!user) {

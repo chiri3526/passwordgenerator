@@ -353,7 +353,7 @@ function AppScreen({
                   />
                   <div>
                     <strong>紛らわしい文字を除外</strong>
-                    <span>Oと0など、見分けにくい文字を除外します。</span>
+                    <span>見分けにくい文字を除外します。</span>
                   </div>
                 </label>
               </div>

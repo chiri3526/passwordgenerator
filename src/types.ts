@@ -25,7 +25,8 @@ export type Preset = {
 export type PasswordHistoryItem = {
   id: string;
   userId: string;
-  password: string;
+  passwordPreview: string;
+  passwordLength: number;
   configSnapshot: PasswordConfig;
   note: string;
   createdAt?: string;

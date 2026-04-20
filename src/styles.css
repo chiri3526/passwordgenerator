@@ -1,5 +1,6 @@
 ﻿:root {
-  font-family: "Aptos", "Yu Gothic UI", "Hiragino Sans", sans-serif;
+  --font-sans: "Aptos", "Noto Sans JP", "Yu Gothic UI", "Hiragino Sans", "Meiryo", sans-serif;
+  font-family: var(--font-sans);
   color: #1c261c;
   background:
     radial-gradient(circle at top left, rgba(255, 214, 153, 0.75), transparent 28%),
@@ -26,6 +27,7 @@
 body {
   margin: 0;
   min-width: 320px;
+  font-family: var(--font-sans);
 }
 
 button,
@@ -75,7 +77,7 @@ code {
 .hero h1,
 .section-heading h2,
 .stack-item h3 {
-  font-family: Georgia, "Yu Mincho", serif;
+  font-family: var(--font-sans);
 }
 
 .auth-copy {

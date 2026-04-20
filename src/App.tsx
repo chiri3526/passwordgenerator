@@ -13,6 +13,7 @@ import {
   subscribeToAuth,
   subscribeToHistory,
   subscribeToPresets,
+  getFriendlyAuthErrorMessage,
   updateHistoryNote,
   updatePresetName
 } from "./lib/firebase";
@@ -24,9 +25,8 @@ import {
   type PasswordHistoryItem,
   type Preset
 } from "./types";
-import passwordGeneratorLogo from "./assets/password-generator-logo.png";
+import passwordGeneratorLogo from "./assets/password-generator-logo.png?url";
 
-const HOME_PATH = "/";
 const APP_PATH = "/generator";
 const STATUS_MESSAGE_TIMEOUT_MS = 4000;
 
@@ -506,8 +506,9 @@ function AppScreen({
                 {history.map((item) => (
                   <article key={item.id} className="stack-item history-item">
                     <div className="history-meta">
-                      <code>{item.password}</code>
+                      <code>{item.passwordPreview || "非表示"}</code>
                       <p className="panel-caption">{formatDate(item.createdAt)}</p>
+                      <p className="panel-caption">保存内容: 平文は保持せず、長さ {item.passwordLength || "不明"} 文字のみ記録</p>
                       <p className="panel-caption">
                         設定: {item.configSnapshot.length}文字 / {item.configSnapshot.count}件 / Prefix {item.configSnapshot.prefix || "なし"}
                       </p>
@@ -520,9 +521,6 @@ function AppScreen({
                     />
 
                     <div className="stack-actions">
-                      <button type="button" className="ghost-button" onClick={() => void onCopy(item.password)}>
-                        コピー
-                      </button>
                       <button type="button" className="primary-button" onClick={() => void onUpdateHistory(item.id)}>
                         メモ保存
                       </button>
@@ -568,7 +566,9 @@ export default function App() {
 
   useEffect(() => {
     if (loadingAuth) return;
-    syncPath(user ? APP_PATH : HOME_PATH);
+    if (user) {
+      syncPath(APP_PATH);
+    }
   }, [loadingAuth, user]);
 
   useEffect(() => {
@@ -651,7 +651,7 @@ export default function App() {
       }
       setPassword("");
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "認証に失敗しました。");
+      setErrorMessage(getFriendlyAuthErrorMessage(error));
     }
   }
 
@@ -661,7 +661,7 @@ export default function App() {
       await loginWithGoogle();
       setStatusMessage("Google でログインしました。");
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Google ログインに失敗しました。");
+      setErrorMessage(getFriendlyAuthErrorMessage(error));
     }
   }
 

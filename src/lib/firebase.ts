@@ -49,11 +49,20 @@ type PresetDocument = {
 
 type HistoryDocument = {
   userId: string;
-  password: string;
+  password?: string;
+  passwordPreview: string;
+  passwordLength: number;
   configSnapshot: PasswordConfig;
   note?: string;
   createdAt?: unknown;
 };
+
+function maskPassword(value: string) {
+  if (!value) return "";
+  if (value.length <= 2) return "*".repeat(value.length);
+  if (value.length <= 6) return `${value[0]}${"*".repeat(value.length - 2)}${value.at(-1) ?? ""}`;
+  return `${value.slice(0, 2)}${"*".repeat(Math.max(value.length - 4, 0))}${value.slice(-2)}`;
+}
 
 function toIsoString(value: unknown) {
   if (typeof value === "string") {
@@ -72,6 +81,28 @@ function compareIsoDateDesc(a?: string, b?: string) {
   if (!a) return 1;
   if (!b) return -1;
   return b.localeCompare(a);
+}
+
+export function getFriendlyAuthErrorMessage(error: unknown) {
+  const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+
+  switch (code) {
+    case "auth/invalid-credential":
+    case "auth/invalid-login-credentials":
+    case "auth/user-not-found":
+    case "auth/wrong-password":
+      return "メールアドレスまたはパスワードが正しくありません。";
+    case "auth/email-already-in-use":
+      return "このメールアドレスでは登録できません。別のメールアドレスをお試しください。";
+    case "auth/popup-closed-by-user":
+      return "Google ログインがキャンセルされました。";
+    case "auth/too-many-requests":
+      return "試行回数が多すぎます。時間をおいて再度お試しください。";
+    case "auth/network-request-failed":
+      return "ネットワークエラーが発生しました。接続を確認して再度お試しください。";
+    default:
+      return "認証に失敗しました。入力内容を確認して再度お試しください。";
+  }
 }
 
 export function subscribeToAuth(listener: (user: User | null) => void) {
@@ -150,7 +181,8 @@ export function subscribeToHistory(
         .map((item) => ({
           id: item.id,
           userId: item.userId,
-          password: item.password,
+          passwordPreview: item.passwordPreview ?? maskPassword(item.password ?? ""),
+          passwordLength: item.passwordLength ?? item.password?.length ?? 0,
           configSnapshot: item.configSnapshot,
           note: item.note ?? "",
           createdAt: toIsoString(item.createdAt)
@@ -201,7 +233,8 @@ export async function savePasswordHistory(
 
   await addDoc(collection(db, "password_history"), {
     userId,
-    password,
+    passwordPreview: maskPassword(password),
+    passwordLength: password.length,
     configSnapshot,
     note,
     createdAt: serverTimestamp()

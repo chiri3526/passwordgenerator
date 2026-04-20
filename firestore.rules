@@ -2,14 +2,97 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function validConfig(config) {
+      return config is map
+        && config.keys().hasOnly([
+          "length",
+          "count",
+          "includeUppercase",
+          "includeLowercase",
+          "includeNumbers",
+          "selectedSymbols",
+          "prefix",
+          "excludeSimilarChars"
+        ])
+        && config.length is int
+        && config.length >= 2
+        && config.length <= 40
+        && config.count is int
+        && config.count >= 1
+        && config.count <= 1000
+        && config.includeUppercase is bool
+        && config.includeLowercase is bool
+        && config.includeNumbers is bool
+        && config.excludeSimilarChars is bool
+        && config.prefix is string
+        && config.prefix.size() <= 40
+        && config.selectedSymbols is list
+        && config.selectedSymbols.size() <= 19;
+    }
+
+    function validPresetCreate() {
+      return request.resource.data.keys().hasOnly(["userId", "name", "config", "createdAt", "updatedAt"])
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
+        && validConfig(request.resource.data.config);
+    }
+
+    function validPresetUpdate() {
+      return request.resource.data.keys().hasOnly(["userId", "name", "config", "createdAt", "updatedAt"])
+        && isOwner(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
+        && validConfig(request.resource.data.config);
+    }
+
+    function validHistoryCreate() {
+      return request.resource.data.keys().hasOnly(["userId", "passwordPreview", "passwordLength", "configSnapshot", "note", "createdAt"])
+        && isOwner(request.resource.data.userId)
+        && request.resource.data.passwordPreview is string
+        && request.resource.data.passwordPreview.size() <= 80
+        && request.resource.data.passwordLength is int
+        && request.resource.data.passwordLength >= 0
+        && request.resource.data.passwordLength <= 256
+        && request.resource.data.note is string
+        && request.resource.data.note.size() <= 500
+        && validConfig(request.resource.data.configSnapshot);
+    }
+
+    function validHistoryUpdate() {
+      return request.resource.data.keys().hasOnly(["userId", "passwordPreview", "passwordLength", "configSnapshot", "note", "createdAt"])
+        && isOwner(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.passwordPreview == resource.data.passwordPreview
+        && request.resource.data.passwordLength == resource.data.passwordLength
+        && request.resource.data.configSnapshot == resource.data.configSnapshot
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note is string
+        && request.resource.data.note.size() <= 500;
+    }
+
     match /presets/{document} {
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, delete: if isOwner(resource.data.userId);
+      allow create: if validPresetCreate();
+      allow update: if validPresetUpdate();
     }
 
     match /password_history/{document} {
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, delete: if isOwner(resource.data.userId);
+      allow create: if validHistoryCreate();
+      allow update: if validHistoryUpdate();
     }
   }
 }

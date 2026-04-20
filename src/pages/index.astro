@@ -4,15 +4,15 @@ import "../redesign.css";
 import passwordGeneratorLogo from "../assets/password-generator-logo.png";
 ---
 
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="ログインしてプリセットと履歴を保存できる、シンプルなパスワード生成ツールです。"
+      content="A simple password generator that lets you sign in, save presets, and keep password history notes."
     />
-    <title>Password Maker | パスワード生成ツール</title>
+    <title>Password Maker | Simple Password Generator</title>
   </head>
   <body>
     <main class="landing-page">
@@ -21,16 +21,17 @@ import passwordGeneratorLogo from "../assets/password-generator-logo.png";
           <div class="landing-copy">
             <img class="landing-logo" src={passwordGeneratorLogo.src} alt="Password Maker" />
             <p class="section-kicker">Password Maker</p>
-            <h1>パスワード生成を、保存までシンプルに。</h1>
+            <h1>Make strong passwords fast.</h1>
             <p class="landing-lead">
-              文字種、長さ、記号、接頭辞を調整してパスワードを生成し、ログイン後はプリセットや履歴、メモを保存できます。
+              Choose the length, character types, symbols, and presets you need, then sign in to save your favorite
+              settings, history, and notes.
             </p>
             <div class="landing-actions">
-              <a class="primary-button" href="/generator">生成ツールを開く</a>
-              <a class="secondary-button" href="/generator">ログインする</a>
+              <a class="primary-button" href="/generator">Open Generator</a>
+              <a class="secondary-button" href="/generator">Sign In</a>
             </div>
           </div>
-          <div class="landing-preview" aria-label="Password Maker の主な機能">
+          <div class="landing-preview" aria-label="Password Maker key features">
             <div class="preview-row">
               <span>Length</span>
               <strong>16</strong>
@@ -49,18 +50,18 @@ import passwordGeneratorLogo from "../assets/password-generator-logo.png";
         </div>
       </section>
 
-      <section class="landing-band" aria-label="機能">
+      <section class="landing-band" aria-label="Features">
         <div class="landing-feature">
-          <strong>生成</strong>
-          <span>条件を調整して複数候補をまとめて作成</span>
+          <strong>Generate</strong>
+          <span>Create multiple passwords at once by adjusting the rules to match your needs.</span>
         </div>
         <div class="landing-feature">
-          <strong>保存</strong>
-          <span>よく使う条件をプリセットとして管理</span>
+          <strong>Save</strong>
+          <span>Keep frequently used settings as presets so you can reuse them quickly.</span>
         </div>
         <div class="landing-feature">
-          <strong>履歴</strong>
-          <span>保存した候補にメモを添えて後から確認</span>
+          <strong>Track</strong>
+          <span>Add notes to saved entries and review the context later without storing plain-text passwords.</span>
         </div>
       </section>
     </main>
